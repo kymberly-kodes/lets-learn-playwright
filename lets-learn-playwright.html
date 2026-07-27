@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Let's Learn: Playwright 🐼</title>
+<style>
+  :root{
+    --plum:#3d1f47;
+    --violet:#6a3b8f;
+    --lavender:#b494d6;
+    --gold:#d4af37;
+    --gold-soft:#e8cf7a;
+    --paper:#f8f5fb;
+    --ink:#241129;
+    --card:#ffffff;
+    --line:#e3d6ee;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(160deg,var(--plum) 0%,var(--violet) 45%,#4a2560 100%);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:28px 18px 60px;}
+  header{
+    text-align:center;
+    color:#fff;
+    padding:18px 10px 26px;
+  }
+  header .mantra{
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+    margin-bottom:6px;
+  }
+  header h1{
+    font-size:32px;
+    margin:0 0 6px;
+  }
+  header p{
+    color:var(--lavender);
+    margin:0;
+    font-size:15px;
+  }
+  nav{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin:22px 0 26px;
+  }
+  nav button{
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:14px;
+    cursor:pointer;
+    transition:.2s;
+  }
+  nav button.active{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:var(--plum);
+    font-weight:600;
+  }
+  section.panel{display:none;}
+  section.panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    padding:22px 24px;
+    margin-bottom:18px;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+  }
+  .card h2{
+    margin-top:0;
+    color:var(--violet);
+    font-size:20px;
+    border-bottom:2px solid var(--line);
+    padding-bottom:10px;
+  }
+  .card h3{color:var(--plum);font-size:16px;margin-bottom:8px;}
+  .badge{
+    display:inline-block;
+    background:var(--lavender);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:3px 10px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .badge.gold{background:var(--gold);color:var(--plum);}
+  table{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:14px;}
+  th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{color:var(--violet);font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+  .trade{font-size:13px;color:#6b5b76;font-style:italic;}
+  ul.tight li{margin-bottom:6px;}
+  .milestone{
+    background:var(--paper);
+    border-left:4px solid var(--gold);
+    padding:10px 14px;
+    border-radius:6px;
+    font-size:14px;
+    margin-top:8px;
+  }
+  .resource{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .resource .rtitle{font-weight:600;color:var(--plum);}
+  .resource .rmeta{font-size:12px;color:#8a7a95;margin-top:2px;}
+  .quiz-q{
+    border-top:1px dashed var(--line);
+    padding:16px 0;
+  }
+  .quiz-q:first-of-type{border-top:none;padding-top:4px;}
+  .opt{
+    display:block;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    margin:6px 0;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .opt:hover{border-color:var(--lavender);}
+  .opt input{margin-right:8px;}
+  textarea{
+    width:100%;
+    min-height:90px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+    font-family:inherit;
+    font-size:14px;
+    resize:vertical;
+  }
+  .feedback{
+    display:none;
+    font-size:13px;
+    margin-top:6px;
+    padding:6px 10px;
+    border-radius:6px;
+  }
+  .feedback.correct{background:#e6f4e6;color:#2e6b2e;}
+  .feedback.incorrect{background:#fbe6e6;color:#8a2e2e;}
+  button.action{
+    background:var(--violet);
+    color:#fff;
+    border:none;
+    padding:11px 20px;
+    border-radius:8px;
+    font-size:14px;
+    cursor:pointer;
+    margin-top:8px;
+  }
+  button.action:hover{background:var(--plum);}
+  button.check{
+    background:transparent;
+    border:1px solid var(--violet);
+    color:var(--violet);
+    padding:6px 14px;
+    border-radius:8px;
+    font-size:13px;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .note{
+    background:#fff8e6;
+    border:1px solid var(--gold-soft);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:13px;
+    color:#6b5820;
+  }
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--plum);color:#fff;padding:10px 20px;border-radius:999px;
+    font-size:13px;opacity:0;transition:.3s;pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mantra">Collaborate with Consciousness 🐼</div>
+    <h1>Let's Learn: Playwright</h1>
+    <p>Beginner → Expert · a real class, built around your actual life</p>
+  </header>
+
+  <nav>
+    <button class="tab-btn active" data-tab="map">🗺️ Course Map</button>
+    <button class="tab-btn" data-tab="mod1">📚 Module 1 · Lesson 1</button>
+    <button class="tab-btn" data-tab="hub">📦 Course Materials</button>
+  </nav>
+
+  <!-- COURSE MAP -->
+  <section class="panel active" id="map">
+    <div class="card">
+      <span class="badge gold">Timeline</span>
+      <h2>Pick your pace</h2>
+      <p style="font-size:14px;color:#5a4a65;">You flagged 8 weeks as optimistic — fair. At 1hr+/day, here's what's actually realistic for beginner → true expert, plus what you're trading off at each pace.</p>
+      <table>
+        <tr><th>Plan</th><th>Length</th><th>Daily load</th><th>What you get</th></tr>
+        <tr>
+          <td><b>Faster</b></td><td>8 weeks</td><td>~75-90 min/day</td>
+          <td>Solid, portfolio-ready intermediate. Skips deep CI/parallelization polish.</td>
+        </tr>
+        <tr style="background:var(--paper);">
+          <td><b>Primary ★</b></td><td>10 weeks</td><td>~60-75 min/day</td>
+          <td>Full beginner → expert path below, with room to actually build the portfolio project instead of rushing it.</td>
+        </tr>
+        <tr>
+          <td><b>Slower</b></td><td>14 weeks</td><td>~45-60 min/day</td>
+          <td>Same depth, more breathing room between modules for retention + a second portfolio piece.</td>
+        </tr>
+      </table>
+      <p class="trade">Running with the <b>Primary (10-week)</b> plan below. Say the word if you want to switch lanes.</p>
+      <div class="note">Assuming <b>Python + pytest-playwright</b> since it lines up with the Python you're already building toward for Obsidian Roots — flag it if you'd rather do this in JS/TypeScript instead.</div>
+    </div>
+
+    <div class="card">
+      <span class="badge">Modules</span>
+      <h2>The three levels</h2>
+
+      <h3>Module 1 · Foundations <span style="font-weight:400;color:#8a7a95;">(Weeks 1–3)</span></h3>
+      <ul class="tight">
+        <li>1.1 Environment setup & your first test <i>(built out below)</i></li>
+        <li>1.2 Locators & the auto-waiting model</li>
+        <li>1.3 Actions, assertions, and debugging with Trace Viewer</li>
+      </ul>
+      <div class="milestone">🎯 Milestone: write and run a working test suite against a real site, solo, no copy-pasted tutorial code.</div>
+
+      <h3 style="margin-top:18px;">Module 2 · Real-World Patterns <span style="font-weight:400;color:#8a7a95;">(Weeks 4–7)</span></h3>
+      <ul class="tight">
+        <li>2.1 Page Object Model & pytest fixtures</li>
+        <li>2.2 Handling flaky/dynamic content</li>
+        <li>2.3 Network interception & mocking</li>
+        <li>2.4 Cross-browser + data-driven tests</li>
+      </ul>
+      <div class="milestone">🎯 Milestone: a maintainable, POM-based suite that mocks an API call and runs clean across Chromium, Firefox, and WebKit.</div>
+
+      <h3 style="margin-top:18px;">Module 3 · Expert <span style="font-weight:400;color:#8a7a95;">(Weeks 8–10)</span></h3>
+      <ul class="tight">
+        <li>3.1 Auth state reuse & parallelization</li>
+        <li>3.2 CI integration (GitHub Actions)</li>
+        <li>3.3 Portfolio project + polish</li>
+      </ul>
+      <div class="milestone">🎯 Milestone: a portfolio-ready repo running in CI, parallelized, with saved auth state — something you'd actually put on GitHub with your name on it.</div>
+      <div class="note" style="margin-top:12px;">🕳️ This module leans on Git/GitHub and basic CI concepts that aren't taught elsewhere in this course. When we get here, Module 3 opens with its own Rabbit Hole check on exactly that — built out when you arrive, not now.</div>
+    </div>
+  </section>
+
+  <!-- MODULE 1 LESSON 1 -->
+  <section class="panel" id="mod1">
+    <div class="card" style="border:2px solid var(--gold-soft);">
+      <span class="badge gold">🕳️ Down the Rabbit Hole?</span>
+      <h2 style="border-bottom:none;">Before we start Module 1</h2>
+      <p style="font-size:14px;color:#5a4a65;margin-top:-6px;">Two things this module leans on. Answer honestly — "solid" skips it, anything else gets you a real detour instead of a silent gap.</p>
+
+      <form name="module1-rabbithole" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="module1-rabbithole-form">
+        <input type="hidden" name="form-name" value="module1-rabbithole">
+        <p style="display:none;"><label>Don't fill this out: <input name="bot-field"></label></p>
+
+        <div class="quiz-q" style="border-top:none;padding-top:6px;">
+          <b>1. The language fork —</b> this course defaults to Python. Treasury runs the Java version of Playwright.
+          <label class="opt"><input type="radio" name="rh1" value="python"> Stick with Python — this is a personal/portfolio build, not tied to work yet</label>
+          <label class="opt"><input type="radio" name="rh1" value="parallel"> Keep Python primary, but flag Java-for-Playwright as a separate detour course for later</label>
+          <label class="opt"><input type="radio" name="rh1" value="switch"> Actually — switch the primary language to Java</label>
+        </div>
+
+        <div class="quiz-q">
+          <b>2. Python fundamentals —</b> functions, loops, imports, basic data structures. Where are you?
+          <label class="opt"><input type="radio" name="rh2" value="solid"> Solid, keep going</label>
+          <label class="opt"><input type="radio" name="rh2" value="rusty"> Rusty — give me a quick refresher inline</label>
+          <label class="opt"><input type="radio" name="rh2" value="detour"> Honestly shaky — I want a real Python foundations detour first</label>
+        </div>
+
+        <button type="submit" class="action">Submit — Claude will grab this next time you chat</button>
+      </form>
+      <div class="note" style="margin-top:10px;">This only actually submits once this file's deployed on Netlify (forms need a live Netlify site to work — previewing it locally will just show a failed-submission toast, that's expected). Once it's live: answer, hit submit, then just tell me "check my rabbit hole answers" next time we chat.</div>
+    </div>
+
+    <div class="card">
+      <span class="badge">Module 1 · Lesson 1.1</span>
+      <h2>Environment Setup & Your First Test</h2>
+
+      <h3>🔧 Tools & setup</h3>
+      <ul class="tight">
+        <li>Python 3.9+ already on your machine (check: <code>python --version</code>)</li>
+        <li><code>pip install pytest-playwright</code></li>
+        <li><code>playwright install</code> — pulls the Chromium/Firefox/WebKit binaries (this is the big one, ~500MB, let it run)</li>
+        <li>A code editor — VS Code recommended for the Playwright test-runner extension</li>
+      </ul>
+
+      <h3 style="margin-top:18px;">📖 Overview</h3>
+      <p style="font-size:14px;line-height:1.6;">
+      Playwright is a browser automation library — it drives a real browser (Chromium, Firefox, or WebKit) programmatically: click things, fill forms, read text, assert what's on the page. What makes it different from older tools like Selenium is <b>auto-waiting</b>: Playwright automatically waits for an element to be actionable (visible, stable, enabled) before interacting with it, instead of you writing manual <code>sleep()</code> calls or explicit wait conditions everywhere. That single design choice is why Playwright suites are dramatically less flaky than Selenium suites out of the box — it's solving the exact "elements aren't ready yet" problem that causes most flaky-test pain in your Selenium/Cucumber world at work.
+      </p>
+      <p style="font-size:14px;line-height:1.6;">
+      A test in <code>pytest-playwright</code> is just a Python function that takes a <code>page</code> fixture — pytest and the plugin handle spinning up the browser for you. You navigate, interact, assert. That's the whole loop for now.
+      </p>
+
+      <h3 style="margin-top:18px;">🧩 Real-world scenario</h3>
+      <p style="font-size:14px;line-height:1.6;">
+      Picture handing a QA analyst on your team a manual test case: "Go to the login page, enter valid credentials, confirm you land on the dashboard." Today's lesson is that exact test case, written as code instead of a step sheet — the translation you'll be doing constantly if Playwright ever becomes part of your team's stack.
+      </p>
+
+      <h3 style="margin-top:18px;">✍️ Hands-on exercise</h3>
+      <div class="resource">
+        <div class="rtitle">Write this test</div>
+        <p style="font-size:14px;margin:8px 0;">Using <a href="https://playwright.dev" target="_blank">playwright.dev</a>'s public demo site (<code>https://playwright.dev</code> itself works fine), write a test that:</p>
+        <ol style="font-size:14px;">
+          <li>Navigates to the Playwright docs homepage</li>
+          <li>Clicks the "Get started" link</li>
+          <li>Asserts the resulting page's heading contains "Installation"</li>
+        </ol>
+        <p style="font-size:13px;color:#8a7a95;">Run it with <code>pytest --headed</code> so you can actually watch the browser do it — that visibility matters more than you'd think when you're new to this.</p>
+      </div>
+
+      <h3 style="margin-top:18px;">📚 Resources (capped at 5, primary sources first)</h3>
+      <div class="resource">
+        <div class="rtitle">Playwright Python docs — Writing Tests</div>
+        <div class="rmeta">Official · free · start here, not with a video course</div>
+      </div>
+      <div class="resource">
+        <div class="rtitle">Playwright Python docs — Auto-waiting</div>
+        <div class="rmeta">Official · free · this is THE concept for today, read it in full</div>
+      </div>
+      <div class="resource">
+        <div class="rtitle">pytest-playwright plugin README (GitHub)</div>
+        <div class="rmeta">Official · free · explains the <code>page</code> fixture and CLI flags like <code>--headed</code></div>
+      </div>
+      <div class="resource">
+        <div class="rtitle">Playwright Trace Viewer docs</div>
+        <div class="rmeta">Official · free · you'll use this the moment something doesn't work — worth 10 min now</div>
+      </div>
+      <p style="font-size:12px;color:#8a7a95;">Note: I'll verify exact current URLs and confirm nothing's moved before this goes into your real syllabus — didn't want to burn search calls on a demo lesson before you'd approved the shape of the thing.</p>
+
+      <h3 style="margin-top:18px;">✅ Quiz + hands-on submission</h3>
+      <p style="font-size:12px;color:#8a7a95;margin-top:-6px;">Questions 1-2 are instant self-check (auto-waiting is objective, no need to wait on me for those). Everything below — your test code and Q3/Q4 — I grade for real once you submit.</p>
+
+      <div class="quiz-q">
+        <b>1. Multiple choice —</b> What does Playwright's auto-waiting mechanism primarily solve?
+        <label class="opt"><input type="radio" name="q1-selfcheck" value="a"> Slow internet connections</label>
+        <label class="opt"><input type="radio" name="q1-selfcheck" value="b"> Interacting with elements before they're actually ready/actionable</label>
+        <label class="opt"><input type="radio" name="q1-selfcheck" value="c"> Browser compatibility differences</label>
+        <button type="button" class="check" onclick="checkMC('q1-selfcheck','b','fb1')">Check</button>
+        <div class="feedback" id="fb1"></div>
+      </div>
+
+      <div class="quiz-q">
+        <b>2. True/False —</b> You need to manually add <code>time.sleep()</code> calls between most Playwright actions to avoid flakiness.
+        <label class="opt"><input type="radio" name="q2-selfcheck" value="true"> True</label>
+        <label class="opt"><input type="radio" name="q2-selfcheck" value="false"> False</label>
+        <button type="button" class="check" onclick="checkMC('q2-selfcheck','false','fb2')">Check</button>
+        <div class="feedback" id="fb2"></div>
+      </div>
+
+      <form name="module1-lesson1-1" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="module1-lesson1-1-form">
+        <input type="hidden" name="form-name" value="module1-lesson1-1">
+        <p style="display:none;"><label>Don't fill this out: <input name="bot-field"></label></p>
+
+        <div class="quiz-q">
+          <b>Hands-on: your test code</b>
+          <textarea name="handson" placeholder="Paste your test code here when you've got it..."></textarea>
+        </div>
+
+        <div class="quiz-q">
+          <b>3. Scenario —</b> A teammate's Playwright test fails intermittently only in CI, never locally. What's your first move, and why?
+          <textarea name="q3-scenario" placeholder="Type your answer — I'll grade this for real."></textarea>
+        </div>
+
+        <div class="quiz-q">
+          <b>4. Explain it back —</b> In your own words, explain why Playwright's model produces less flaky tests than the manual-wait style you deal with in your Selenium/Cucumber setup at work.
+          <textarea name="q4-explainback" placeholder="Explain it back in your own words..."></textarea>
+        </div>
+
+        <button type="submit" class="action">Submit for grading</button>
+      </form>
+      <div class="note" style="margin-top:10px;">Same deal as the Rabbit Hole form — this needs the file actually deployed on Netlify to submit anywhere. Once it's live, submit, then tell me "grade lesson 1.1" next time we chat.</div>
+    </div>
+  </section>
+
+  <!-- COURSE MATERIALS HUB -->
+  <section class="panel" id="hub">
+    <div class="card">
+      <span class="badge gold">Hub</span>
+      <h2>Course Materials Index</h2>
+      <p style="font-size:14px;">Everything for this course, one place. Future lessons get added here as you reach them — not dumped in all at once.</p>
+      <h3>Full syllabus</h3>
+      <p style="font-size:14px;">See the <b>Course Map</b> tab — 3 modules, 10 lessons, 10-week primary timeline.</p>
+      <h3 style="margin-top:14px;">Progress</h3>
+      <div class="note">Heads up: this file can't remember your progress between page loads (no browser storage allowed in this format). Two options going forward — I regenerate this portal each session with your current status baked in, or you keep a running progress note in Obsidian and tell me where you are when you come back. Your call.</div>
+      <h3 style="margin-top:14px;">Grading scale</h3>
+      <table>
+        <tr><th>Score</th><th>Meaning</th></tr>
+        <tr><td>A</td><td>Correct, handles edge cases, follows the actual practice being taught</td></tr>
+        <tr><td>B</td><td>Works, misses an edge case or best practice</td></tr>
+        <tr><td>C</td><td>Partially correct, a real gap in understanding</td></tr>
+        <tr><td>Needs revisit</td><td>Off track — we re-teach that piece before moving on</td></tr>
+      </table>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+function checkMC(name, correct, fbId){
+  const sel = document.querySelector(`input[name="${name}"]:checked`);
+  const fb = document.getElementById(fbId);
+  fb.style.display='block';
+  if(!sel){ fb.className='feedback incorrect'; fb.textContent='Pick an answer first.'; return; }
+  if(sel.value===correct){
+    fb.className='feedback correct'; fb.textContent='✓ Correct.';
+  } else {
+    fb.className='feedback incorrect'; fb.textContent='✗ Not quite — reread the auto-waiting section above.';
+  }
+}
+
+// Netlify Forms submit handler — intercepts submit so the page doesn't
+// jump to Netlify's default success page; keeps this feeling like one portal.
+document.querySelectorAll('form[data-netlify="true"]').forEach(form => {
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const data = new FormData(form);
+    fetch('/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(data).toString()
+    }).then(() => showToast('Submitted — Claude can grab this next time you chat 🐼'))
+      .catch(() => showToast('Submission failed — this only works once the file is deployed on Netlify'));
+  });
+});
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
